@@ -1,10 +1,12 @@
 # Asana
 
 ### ToDO
-[ ] Fix list todos to show todo completion
+[X] Fix list todos to show todo completion
 
 [ ] Fix list project to show project completion
 
-[ ] Fix to string for project
+[X] Fix to string for project
 
-[ ] Fix to string for ToDo
+[X] Fix to string for ToDo
+
+[ ] Auto update complete percent when updating a project
