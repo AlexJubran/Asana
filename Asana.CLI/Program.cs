@@ -40,7 +40,7 @@ namespace Asana
                             Console.Write("Description:");
                             var description = Console.ReadLine();
 
-                            toDos.Add(new ToDo { Name = name, Description = description });
+                            toDos.Add(new ToDo { Name = name, Description = description, IsCompleted = false });
                             break;
 
 
@@ -61,10 +61,14 @@ namespace Asana
                             string suID = Console.ReadLine() ?? "-1";
                             int uID = Int32.Parse(suID);
 
-                            Console.Write("Name:");
+                            Console.Write("Current Name: " + toDos[uID].Name + " \nName:");
                             var u_name = Console.ReadLine();
+
+                            Console.WriteLine($"Current Description: {toDos[uID].Description}");
                             Console.Write("Description:");
                             var u_description = Console.ReadLine();
+
+                            Console.WriteLine($"Current Status: {toDos[uID].IsCompleted}");
                             Console.Write("Completed (T/F):");
                             string? completeLetter = Console.ReadLine();
                             bool complete = false;
@@ -107,7 +111,18 @@ namespace Asana
 
                             }
 
-                            projects.Add(new Project { Name = p_name, Description = p_description,  toDoIDs = newToDos});
+                            int numCompleted = 0;
+
+                            for (int i = 0; i < newToDos.Count(); i++)
+                            {
+                                if (toDos[newToDos[i]].IsCompleted == true)
+                                {
+                                    numCompleted++;
+                                }
+                            }
+                            int completePercent = numCompleted / newToDos.Count();
+
+                            projects.Add(new Project { Name = p_name, Description = p_description,  toDoIDs = newToDos, CompletePercent = completePercent});
                             break;
 
 
@@ -122,7 +137,44 @@ namespace Asana
                             }
                             break;
                         case 7://Update a project
+                            Console.Write("ID to update:");
+                            string stringProjectID = Console.ReadLine() ?? "-1";
+                            int editProjectID = Int32.Parse(stringProjectID);
+
+                            Console.Write("Current Name: " + projects[editProjectID].Name + " \nName:");
+                            var project_name = Console.ReadLine();
+
+                            Console.WriteLine($"Current Description: {projects[editProjectID].Description}");
+                            Console.Write("Description:");
+                            var project_description = Console.ReadLine();
+
+                            Console.WriteLine("Current ToDos:");
+
+                            for (int i = 0; i < projects[editProjectID].toDoIDs.Count(); i++)
+                            {
+                                Console.Write($"{projects[editProjectID].toDoIDs[i]} ");
+                            }
+
+                            int editToDoIndex = 0;
+
+                            List<int> editToDos = new List<int>();
+
+                            while (editToDoIndex >= 0)
+                            {
+                                Console.Write("ToDO ID to add to project (-1 to quit):");
+                                string stringToDoID = Console.ReadLine() ?? "-1";
+                                editToDoIndex = Int32.Parse(stringToDoID);
+
+                                if (editToDoIndex <= toDos.Capacity && editToDoIndex >= 0)
+                                {
+                                    editToDos.Add(editToDoIndex);
+                                }
+
+                            }
+
+
                             break;
+
                         case 8://list all projects
                             for (int i = 0; i < projects.Count(); i++)
                             {
@@ -145,7 +197,7 @@ namespace Asana
 
                 if(toDos.Any())
                 {
-                    Console.WriteLine(toDos.Last());
+                    //Console.WriteLine(toDos.Last());
                 }
 
             } while (choiceInt != 10);
