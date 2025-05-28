@@ -9,7 +9,8 @@ namespace Asana
         {
             var toDos = new List<ToDo>();
             var projects = new List<Project>();
-            
+            int itemCount = 0;
+            int projectCount = 0;
             int choiceInt;
             do
             {
@@ -40,11 +41,12 @@ namespace Asana
                             Console.Write("Description:");
                             var description = Console.ReadLine();
 
-                            toDos.Add(new ToDo { Name = name, Description = description, IsCompleted = false });
+                            toDos.Add(new ToDo { Name = name, Description = description, IsCompleted = false , Id = ++itemCount });
                             break;
 
 
                         case 2://delete
+                            toDos.ForEach(Console.WriteLine);
                             Console.Write("ID to delete:");
                             string sID = Console.ReadLine() ?? "-1";
                             int dID = Int32.Parse(sID);
@@ -57,10 +59,17 @@ namespace Asana
 
 
                         case 3://update
+
+                            toDos.ForEach(Console.WriteLine);
                             Console.Write("ID to update:");
                             string suID = Console.ReadLine() ?? "-1";
                             int uID = Int32.Parse(suID);
-
+                            uID--; //covert from ID to list index
+                            if (uID < 0)
+                            {
+                                Console.WriteLine("Invalid ID");
+                                break;
+                            }
                             Console.Write("Current Name: " + toDos[uID].Name + " \nName:");
                             var u_name = Console.ReadLine();
 
@@ -76,15 +85,12 @@ namespace Asana
                             {
                                 complete = true;
                             }
-                            toDos[uID] = new ToDo { Name = u_name, Description = u_description, IsCompleted = complete };
+                            toDos[uID] = new ToDo { Name = u_name, Description = u_description, IsCompleted = complete, Id = toDos[uID].Id };
                             break;
 
 
                         case 4://List
-                            for (int i = 0; i < toDos.Count(); i++)
-                            {
-                                Console.WriteLine($"{i}: {toDos[i]}");
-                            }
+                            toDos.ForEach(Console.WriteLine);
                             break;
 
 
@@ -98,15 +104,24 @@ namespace Asana
 
                             List<int> newToDos = new List<int>();
 
+                            toDos.ForEach(Console.WriteLine);
+
                             while (toDoIndex >= 0)
                             {
                                 Console.Write("ToDO ID to add to project (-1 to quit):");
                                 string stringToDoID = Console.ReadLine() ?? "-1";
                                 toDoIndex = Int32.Parse(stringToDoID);
+                                toDoIndex--; //covert from ID to list index
+                                if (toDoIndex < 0)
+                                {
+                                    Console.WriteLine("Invalid ID");
+                                    break;
+                                }
 
                                 if (toDoIndex <= toDos.Capacity && toDoIndex >= 0)
                                 {
                                     newToDos.Add(toDoIndex);
+                                    Console.WriteLine($"Added {toDos[toDoIndex].Name}");
                                 }
 
                             }
@@ -120,9 +135,13 @@ namespace Asana
                                     numCompleted++;
                                 }
                             }
-                            int completePercent = numCompleted / newToDos.Count();
+                            int completePercent = 0;
+                            if (newToDos.Count() > 0)
+                            {
+                                completePercent = 100 * numCompleted / newToDos.Count();
+                            }
 
-                            projects.Add(new Project { Name = p_name, Description = p_description,  toDoIDs = newToDos, CompletePercent = completePercent});
+                            projects.Add(new Project { Name = p_name, Description = p_description,  toDoIDs = newToDos, CompletePercent = completePercent, Id = ++projectCount });
                             break;
 
 
@@ -136,10 +155,19 @@ namespace Asana
                                 projects.RemoveAt(projectID);
                             }
                             break;
+
                         case 7://Update a project
+                            projects.ForEach(Console.WriteLine);
+
                             Console.Write("ID to update:");
                             string stringProjectID = Console.ReadLine() ?? "-1";
                             int editProjectID = Int32.Parse(stringProjectID);
+                            editProjectID--;
+                            if (editProjectID < 0)
+                            {
+                                Console.WriteLine("Invalid ID");
+                                break;
+                            }
 
                             Console.Write("Current Name: " + projects[editProjectID].Name + " \nName:");
                             var project_name = Console.ReadLine();
@@ -147,43 +175,109 @@ namespace Asana
                             Console.WriteLine($"Current Description: {projects[editProjectID].Description}");
                             Console.Write("Description:");
                             var project_description = Console.ReadLine();
-
+                            
                             Console.WriteLine("Current ToDos:");
 
                             for (int i = 0; i < projects[editProjectID].toDoIDs.Count(); i++)
                             {
-                                Console.Write($"{projects[editProjectID].toDoIDs[i]} ");
+                                Console.Write($"{toDos[projects[editProjectID].toDoIDs[i]]} ");
                             }
-
-                            int editToDoIndex = 0;
+                            Console.WriteLine();
+                            int editToDoIndex = 1;
 
                             List<int> editToDos = new List<int>();
-
+                            Console.WriteLine("All ToDos:");
+                            toDos.ForEach(Console.WriteLine);
                             while (editToDoIndex >= 0)
                             {
                                 Console.Write("ToDO ID to add to project (-1 to quit):");
+                                
                                 string stringToDoID = Console.ReadLine() ?? "-1";
                                 editToDoIndex = Int32.Parse(stringToDoID);
+
+                                editToDoIndex--; //covert from ID to list index
+                                if (editToDoIndex < 0)
+                                {
+                                    Console.WriteLine("Invalid ID");
+                                    break;
+                                }
 
                                 if (editToDoIndex <= toDos.Capacity && editToDoIndex >= 0)
                                 {
                                     editToDos.Add(editToDoIndex);
+                                    Console.WriteLine($"Added {toDos[editToDoIndex].Name}");
                                 }
 
                             }
 
+                            int completeNum = 0;
 
+                            for (int i = 0; i < editToDos.Count(); i++)
+                            {
+                                if (toDos[editToDos[i]].IsCompleted == true)
+                                {
+                                    completeNum++;
+                                }
+                            }
+                            int percent = 0;
+                            if (editToDos.Count() > 0)
+                            {
+                                percent = 100 * completeNum / editToDos.Count();
+                            }
+
+                            projects[editProjectID] = new Project { Name = project_name, Description = project_description, toDoIDs = editToDos, CompletePercent = percent };
                             break;
 
                         case 8://list all projects
-                            for (int i = 0; i < projects.Count(); i++)
+                            //update complete percent before printing
+                            foreach (var project in projects)
                             {
-                                Console.WriteLine($"{i}: {projects[i]}");
+                                int completed = 0;
+                                for (int i = 0; i < project.toDoIDs.Count(); i++)
+                                {
+                                    if (toDos[project.toDoIDs[i]].IsCompleted == true)
+                                    {
+                                        completed++;
+                                    }
+                                }
+                                int c_percent = 0;
+                                if (project.toDoIDs.Count() > 0)
+                                {
+                                    c_percent = 100 * completed / project.toDoIDs.Count();
+                                }
+                                project.CompletePercent = c_percent;
+                            }
+
+                            
+
+                 
+                            foreach (var project in projects)
+                            {
+                                Console.WriteLine(project);
                             }
                             break;
 
 
+                        case 9: //list toDos in a project
+                            projects.ForEach(Console.WriteLine);
+
+                            Console.Write("Project ID:");
+                            string stringPID = Console.ReadLine() ?? "-1";
+                            int ePID = Int32.Parse(stringPID);
+                            ePID--;
+                            if (ePID < 0)
+                            {
+                                Console.WriteLine("Invalid ID");
+                                break;
+                            }
+
+                            foreach (var todo in projects[ePID].toDoIDs)
+                            {
+                                Console.WriteLine(toDos[todo]);
+                            }
+
                             break;
+
                         case 10:
                             break;
                         default:
@@ -195,10 +289,6 @@ namespace Asana
                     Console.WriteLine($"ERROR: {choice} is not a valid menu selection");
                 }
 
-                if(toDos.Any())
-                {
-                    //Console.WriteLine(toDos.Last());
-                }
 
             } while (choiceInt != 10);
 
