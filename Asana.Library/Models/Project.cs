@@ -12,29 +12,16 @@ namespace Asana.Library.Models
         public string? Description { get; set; }
         public double? CompletePercent { get; set; }
         public List<int> toDoIDs { get; set; } = new List<int>();
+        public int Id { get; set; }
 
         public override string ToString()
         {
             //return $"{Name} - {Description} - {CompletePercent}";
             string response = string.Empty;
-            response += Name + "-" + Description + "-Todo IDs: ";
+            response += $"[{Id}]" + Name + "-" + Description + $"-{CompletePercent}%";
 
-            foreach (int item in toDoIDs)
-            {
-                response += item;
-            }
             return response;
         }
 
-        public string listToDos()
-        {
-            string todos = string.Empty;
-            foreach (var item in toDoIDs)
-            {
-                todos += item.ToString() + " ";
-            }
-
-            return todos;
-        }
     }
 }
